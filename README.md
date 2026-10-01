@@ -56,3 +56,18 @@ Data preparation (`lead_scoring/prepare.py`):
 | `question_6.py` | Same cross-validation for `C` in `[0.000001, 0.001, 1]`. Mean and std are rounded to 3 digits. Ties go to the lower std, then the smaller `C`. |
 
 `python -m lead_scoring` writes `results/answers.json` plus the question 3 and 4 tables and plots.
+
+## Answers
+
+Missing values are present. Categorical gaps: `lead_source` 148, `industry` 240, `employment_status` 194, `location` 208. Numerical gaps: `annual_income` 369, `lead_score` 35. `number_of_courses_viewed` and `interaction_count` are complete. After imputation the feature matrix has no missing values. The split is 3000 / 1000 / 1000 (train / validation / test).
+
+| Question | Answer | Detail |
+| --- | --- | --- |
+| 1 | `lead_score` | Training AUC 0.788. Next is `interaction_count` at 0.765. None of the four features had AUC below 0.5, so none were negated. |
+| 2 | 0.732 | Validation ROC AUC is 0.731822, rounded to 3 digits. |
+| 3 | 0.63 | Precision 0.733 and recall 0.725. Thresholds 0.97–1.00 are ignored because both metrics are zero. |
+| 4 | 0.41 | Maximum F1 is 0.758 (precision 0.619, recall 0.976). |
+| 5 | 0.007 | Fold AUCs average 0.732. Population std is 0.006853, which rounds to 0.007. |
+| 6 | 0.001 | Rounded mean AUC: `C=0.000001` → 0.617, `C=0.001` → 0.749, `C=1` → 0.732. |
+
+Question 5 uses `numpy.std` (divide by N). The sample standard deviation is 0.0077 and is not the figure the comparison uses.

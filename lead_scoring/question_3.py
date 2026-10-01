@@ -43,9 +43,12 @@ def solve() -> dict:
 
 def save_plot(table: pd.DataFrame, threshold: float, path=PLOT_PATH) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    display = table.copy()
+    undefined = display["both_zero"] == 1.0
+    display.loc[undefined, ["precision", "recall"]] = float("nan")
     fig, ax = plt.subplots(figsize=(8.2, 4.8), dpi=140)
-    ax.plot(table["threshold"], table["precision"], color="#0f6e6e", linewidth=2.0, label="Precision")
-    ax.plot(table["threshold"], table["recall"], color="#c4492c", linewidth=2.0, label="Recall")
+    ax.plot(display["threshold"], display["precision"], color="#0f6e6e", linewidth=2.0, label="Precision")
+    ax.plot(display["threshold"], display["recall"], color="#c4492c", linewidth=2.0, label="Recall")
     row = table.loc[table["threshold"] == threshold].iloc[0]
     ax.axvline(threshold, color="#1f2933", linestyle="--", linewidth=1.0, label=f"Closest pair ({threshold:.2f})")
     ax.scatter([threshold], [row["precision"]], color="#0f6e6e", zorder=3)
@@ -68,9 +71,13 @@ def main() -> dict:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     result["table"].to_csv(TABLE_PATH, index=False)
     save_plot(result["table"], result["threshold"])
-    nearest = result["table"].nsmallest(5, "abs_diff")
+    usable = result["table"].loc[result["table"]["both_zero"] == 0.0]
+    ignored = result["table"].loc[result["table"]["both_zero"] == 1.0, "threshold"]
+    nearest = usable.nsmallest(5, "abs_diff")
     print("Question 3: precision and recall intersection")
-    print("  Closest thresholds (both-zero rows excluded from the choice):")
+    ignored_text = ", ".join(f"{value:.2f}" for value in ignored.tolist())
+    print(f"  Ignored thresholds where both metrics are zero: {ignored_text}")
+    print("  Closest remaining thresholds:")
     for _, row in nearest.iterrows():
         print(
             f"    t={row['threshold']:.2f}  precision={row['precision']:.4f}  "

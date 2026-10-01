@@ -61,7 +61,7 @@ def main() -> dict:
     print("Question 6")
     for row in q6["rows"]:
         print(
-            f"  C={row['C']:<10} mean={row['mean_rounded']:.3f}  std={row['std_rounded']:.3f}"
+            f"  C={row['C']:.6f}  mean={row['mean_rounded']:.3f}  std={row['std_rounded']:.3f}"
         )
     print(f"ANSWER: {q6['answer']}")
 
